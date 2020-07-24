@@ -8,4 +8,5 @@ setup(name='bunnycdn-storage',
     author_email='atze.danjo@gmail.com',
     license='GPLv3+',
     packages=['bunnycdn_storage'],
+    install_requires=['requests'],
     zip_safe=False)
