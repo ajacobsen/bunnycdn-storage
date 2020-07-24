@@ -28,7 +28,6 @@ class BunnyCDNStorage:
 
     def _send_http_request(self, path, method, payload=None, data_length=None):
         url = '{}{}'.format(self._get_base_url(), path)
-        print(url)
         headers = { 'AccessKey' : self._access_token }
         if method == 'PUT' and payload and data_length: 
             headers.update({
