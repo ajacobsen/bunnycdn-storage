@@ -2,10 +2,13 @@ import requests
 
 class BunnyCDNStorage:
     """docstring for BunnyCDNStorage"""
-    def __init__(self, storage_zone, access_token, storage_zone_region="de", debug=False):
+    def __init__(self, storage_zone, access_token, pullzone_url, storage_zone_region="de", debug=False):
         self._storage_zone = storage_zone
         self._access_token = access_token
         self._storage_zone_region = storage_zone_region
+        self._pullzone_url = pullzone_url
+        if not pullzone_url.endswith('/'):
+            self._pullzone_url += '/'
         self._DEBUG = debug
 
     def _get_base_url(self):
@@ -17,6 +20,9 @@ class BunnyCDNStorage:
             return 'https://storage.bunnycdn.com/{}/'.format(self._storage_zone)
         else:
             return 'https://{}.bunnycdn.com/{}/'.format(self._storage_zone_region, self._storage_zone)
+
+    def _get_pullzone_base_url(self):
+        return self._pullzone_url
 
     def _normalize_path(self, path, is_directory=False):
         """Normalize a path string"""
@@ -71,3 +77,10 @@ class BunnyCDNStorage:
         content = self._send_http_request(path, 'GET')
         with open(local_path, 'wb') as f:
             f.write(content)
+
+    def object_exists(self, path):
+        """Check if object is exists"""
+        path = self._normalize_path(path)
+        url = '{}{}'.format(self._get_pullzone_base_url(), path)
+        r = requests.head(url)
+        return r.status_code == 200
