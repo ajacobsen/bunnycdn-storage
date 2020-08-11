@@ -2,11 +2,12 @@ import requests
 
 class BunnyCDNStorage:
     """docstring for BunnyCDNStorage"""
-    def __init__(self, storage_zone, access_token, pullzone_url, storage_zone_region="de", debug=False):
+    def __init__(self, storage_zone, access_token, pullzone_url, account_token, storage_zone_region="de", debug=False):
         self._storage_zone = storage_zone
         self._access_token = access_token
-        self._storage_zone_region = storage_zone_region
         self._pullzone_url = pullzone_url
+        self._account_token = account_token
+        self._storage_zone_region = storage_zone_region
         if not pullzone_url.endswith('/'):
             self._pullzone_url += '/'
         self._DEBUG = debug
@@ -58,6 +59,7 @@ class BunnyCDNStorage:
     def delete_object(self, path):
         """Delete an object at the given path. If the object is a directory, the contents will also be deleted."""
         path = self._normalize_path(path)
+        self._purge_cache(path)
         return self._send_http_request(path, 'DELETE')
 
     def upload_file(self, local_path, path):
@@ -84,3 +86,9 @@ class BunnyCDNStorage:
         url = '{}{}'.format(self._get_pullzone_base_url(), path)
         r = requests.head(url)
         return r.status_code == 200
+
+    def _purge_cache(self, path):
+        """Purge the given path from our edge server cache."""
+        headers = {'AccessKey' : self._account_token}
+        url = 'https://bunnycdn.com/api/purge?url={}{}'.format(self._get_pullzone_base_url(), path)
+        r = requests.post(url, headers=headers)
