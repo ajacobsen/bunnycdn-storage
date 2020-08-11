@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='bunnycdn-storage',
-    version='0.3',
+    version='0.4',
     description='A python module for the BunnyCDN Storage API',
     url='https://github.com/ajacobsen/bunnycdn-storage',
     author='Andy Jacobsen',
